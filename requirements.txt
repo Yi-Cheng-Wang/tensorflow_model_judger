@@ -1,0 +1,5 @@
+tensorflow == 2.9
+numpy
+flask
+secrets
+sqlite3
