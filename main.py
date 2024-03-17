@@ -14,10 +14,10 @@ if not os.path.exists('file_storage'):
 app = Flask(__name__)
 
 # setting max size of file
-MAX_FILESIZE = 50 * 1024 *1024
+MAX_FILESIZE = 'your_max_filesize'
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILESIZE
 
-TOKEN_PREFIX = 'test'
+TOKEN_PREFIX = 'your_token_prefix'
 token_verify = token_manager.TokenManager('token_db/tokens.db')
 
 @app.errorhandler(413)
