@@ -20,7 +20,7 @@ class TokenManager:
         conn.close()
 
     def generate_token(self, user_id):
-        token = secrets.token_hex(16)
+        token = secrets.token_hex(32)
         conn = sqlite3.connect(self.db_file)
         c = conn.cursor()
         c.execute("INSERT INTO tokens VALUES (?, ?)", (token, user_id))

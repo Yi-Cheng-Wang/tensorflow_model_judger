@@ -10,14 +10,14 @@ def score(predictions, ansers):
     score = 0
     tem = 0
     counter = 0
-    for i in predictions[0]:
-        tem = ansers[counter] - i
+    for i in predictions:
+        tem = ansers[counter] - i[0]
         counter = counter + 1
         if (tem < 0) :
             tem = tem * -1
-        if (tem**2 > 10) :
+        if (tem > 100) :
             continue
-        score = score + (10 - tem**2)/10
+        score = score + (100 - tem)/100
     score = score*(100/counter)
     return score
 
