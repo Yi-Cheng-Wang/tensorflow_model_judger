@@ -15,7 +15,7 @@ for directory in directories:
 app = Flask(__name__)
 
 # setting max size of file
-MAX_FILESIZE = 100000#'your_max_filesize'
+MAX_FILESIZE = 50 * 1024 * 1024 #'your_max_filesize'
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILESIZE
 
 TOKEN_PREFIX = 'your_token_prefix'
