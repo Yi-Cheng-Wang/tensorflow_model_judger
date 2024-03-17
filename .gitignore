@@ -2,3 +2,5 @@ __pycache__
 file_storage
 token_db
 token_folder
+score_db
+working_file

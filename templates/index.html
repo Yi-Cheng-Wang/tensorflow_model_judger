@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scores</title>
+</head>
+<body>
+    <h1>Scores</h1>
+
+    <p id="countdown">Updating...</p>
+
+    <ol id="score-list">
+        {% for user_id, score in all_scores %}
+            <li>User {{ user_id }}: {{ score }}</li>
+        {% endfor %}
+    </ol>
+
+    <script>
+        function refreshScores() {
+            fetch('/scores')
+                .then(response => response.json())
+                .then(data => {
+                    const scoreList = document.getElementById('score-list');
+                    scoreList.innerHTML = '';
+                    data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = `User ${String(item[0]).padStart(2, '0')}: ${item[1]}`;
+                        scoreList.appendChild(li);
+                    });
+                });
+
+            const countdownElem = document.getElementById('countdown');
+            let seconds = 10;
+            const timer = setInterval(() => {
+                seconds -= 1;
+                countdownElem.textContent = `Next update in ${seconds} seconds`;
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    countdownElem.textContent = 'Updating...';
+                    refreshScores();
+                }
+            }, 1000);
+        }
+
+        refreshScores();
+    </script>
+</body>
+</html>

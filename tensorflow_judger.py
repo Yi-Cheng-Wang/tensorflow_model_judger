@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import score_manager
 
 def prepare_data():
     xs = np.array([1, 2,  3,  4, 5, 6, 100000],  dtype=float)
@@ -21,11 +22,12 @@ def score(predictions, ansers):
     score = score*(100/counter)
     return score
 
-def judger(file_name):
+def judger(file_name, user_id):
     model = tf.keras.models.load_model(file_name)
     xs, ys = prepare_data()
     predictions = model.predict(xs)
     result = score(predictions, ys)
+    score_manager.add_score(user_id, result)
     return result
 
 if __name__ == '__main__':
