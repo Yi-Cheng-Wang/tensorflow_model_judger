@@ -41,11 +41,11 @@ def add_score(user_id, score):
     if max_score is None or score > max_score:
         c.execute("INSERT INTO scores (user_id, score) VALUES (?, ?)", (user_id, score))
         conn.commit()
-        print(f'New score {score} added for user {user_id}')
+        conn.close()
+        return f'New score {score} added for user {user_id}'
     else:
-        print(f'Score {score} is not higher than the previous highest score {max_score}, not added.')
-
-    conn.close()
+        conn.close()
+        return f'Score {score} is not higher than the previous highest score {max_score}, not added.'
 
 def get_all_scores():
     conn = sqlite_pool.connect()

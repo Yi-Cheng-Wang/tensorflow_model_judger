@@ -4,17 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #countdown {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .user-score {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #f2f2f2;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Scores</h1>
+    <div class="container">
+        <h1>Scores</h1>
 
-    <p id="countdown">Updating...</p>
+        <p id="countdown">Updating...</p>
 
-    <ol id="score-list">
-        {% for user_id, score in all_scores %}
-            <li>User {{ user_id }}: {{ score }}</li>
-        {% endfor %}
-    </ol>
+        <div id="score-list">
+        </div>
+    </div>
 
     <script>
         function refreshScores() {
@@ -24,9 +62,13 @@
                     const scoreList = document.getElementById('score-list');
                     scoreList.innerHTML = '';
                     data.forEach(item => {
-                        const li = document.createElement('li');
-                        li.textContent = `User ${String(item[0]).padStart(2, '0')}: ${item[1]}`;
-                        scoreList.appendChild(li);
+                        const userScoreDiv = document.createElement('div');
+                        userScoreDiv.classList.add('user-score');
+                        userScoreDiv.innerHTML = `
+                            <span>User ${String(item[0]).padStart(2, '0')}</span>
+                            <span>Score: ${item[1]}</span>
+                        `;
+                        scoreList.appendChild(userScoreDiv);
                     });
                 });
 

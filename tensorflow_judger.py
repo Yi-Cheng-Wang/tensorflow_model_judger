@@ -27,8 +27,8 @@ def judger(file_name, user_id):
     xs, ys = prepare_data()
     predictions = model.predict(xs)
     result = score(predictions, ys)
-    score_manager.add_score(user_id, result)
-    return result
+    message = score_manager.add_score(user_id, result)
+    return result, message
 
 if __name__ == '__main__':
     print('tensorflow_judger: This file should not be __main__.')

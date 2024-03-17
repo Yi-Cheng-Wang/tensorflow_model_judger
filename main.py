@@ -61,8 +61,8 @@ def upload_file(user_id):
     if file and allowed_file(file.filename):
         filename = './file_storage/' + str(user_id) + '_' + secure_filename(generate_random_string(32))
         file.save(filename)
-        result = tensorflow_judger.judger(filename, user_id)
-        return jsonify({'score': result, 'status': 'success', 'message': 'File uploaded successfully', 'user': user_id})
+        result, message = tensorflow_judger.judger(filename, user_id)
+        return jsonify({'score': result, 'status': 'success', 'message': message, 'user': user_id})
 
     return jsonify({'score': 0.0, 'status': 'error', 'message': 'File upload failed', 'user': user_id})
 
