@@ -1,5 +1,5 @@
-tensorflow == 2.15
-numpy
-flask
-secrets
-sqlite3
+Flask==3.0.2
+numpy==1.24.3
+tensorflow==2.13.0
+tensorflow_intel==2.13.0
+Werkzeug==3.0.1
