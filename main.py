@@ -6,6 +6,7 @@ import score_manager
 import os
 import secrets
 import string
+import settings
 
 directories = ['token_db', 'file_storage', 'score_db']
 for directory in directories:
@@ -14,16 +15,15 @@ for directory in directories:
 
 app = Flask(__name__)
 
-# setting max size of file
-MAX_FILESIZE = 50 * 1024 * 1024 #'your_max_filesize'
-app.config['MAX_CONTENT_LENGTH'] = MAX_FILESIZE
+TOKEN_PREFIX = settings.TOKEN_PREFIX
+app.config['MAX_CONTENT_LENGTH'] = settings.MAX_FILESIZE
 
-TOKEN_PREFIX = 'your_token_prefix'
-token_verify = token_manager.TokenManager('token_db/tokens.db')
+token_verify = token_manager.TokenManager(settings.TOKEN_DB)
+score_getting = score_manager.ScoreManager(settings.SCORE_DB)
 
 @app.errorhandler(413)
 def request_entity_too_large(error):
-    return jsonify({'score': 0.0, 'status': 'error', 'message': f'File size should not exceed {MAX_FILESIZE / (1024 * 1024)} MB', 'user': 'Pre-production phase obstruction'}), 413
+    return jsonify({'score': 0.0, 'status': 'error', 'message': f'File size should not exceed {settings.MAX_FILESIZE / (1024 * 1024)} MB', 'user': 'Pre-production phase obstruction'}), 413
 
 @app.errorhandler(500)
 def internal_server_error(error):
@@ -69,12 +69,12 @@ def upload_file(user_id):
 @app.route('/', methods=['GET'])
 def index():
     # get all of the score and return
-    all_scores = score_manager.get_all_scores()
+    all_scores = score_getting.get_all_scores()
     return render_template('index.html', all_scores=all_scores)
 
 @app.route('/scores')
 def scores():
-    all_scores = score_manager.get_all_scores()
+    all_scores = score_getting.get_all_scores()
     return jsonify(all_scores)
 
 def allowed_file(filename):

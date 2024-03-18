@@ -1,58 +1,45 @@
 import sqlite3
 import os
-import threading
 
-class SQLitePool:
-    def __init__(self):
-        self._local = threading.local()
-        self._initialize_database()
+class ScoreManager:
+    def __init__(self, db_file):
+        self.db_file = db_file
+        self.create_table()
 
-    def _initialize_database(self):
-        conn = self.connect()
+    def create_table(self):
+        db_dir = os.path.dirname(self.db_file)
+        if not os.path.exists(db_dir):
+            os.makedirs(db_dir)
+
+        conn = sqlite3.connect(self.db_file)
         c = conn.cursor()
-
         c.execute('''CREATE TABLE IF NOT EXISTS scores
                         (id INTEGER PRIMARY KEY, user_id INTEGER, score REAL)''')
-
         conn.commit()
         conn.close()
 
-    def connect(self):
-        if not hasattr(self._local, 'conn'):
-            if not os.path.exists('score_db'):
-                os.makedirs('score_db')
-            self._local.conn = sqlite3.connect('score_db/scores.db')
-        return self._local.conn
+    def add_score(self, user_id, score):
+        conn = sqlite3.connect(self.db_file)
+        c = conn.cursor()
 
-    def close(self):
-        if hasattr(self._local, 'conn'):
-            self._local.conn.close()
-            del self._local.conn
+        c.execute("SELECT MAX(score) FROM scores WHERE user_id=?", (user_id,))
+        max_score = c.fetchone()[0]
 
-sqlite_pool = SQLitePool()
+        if max_score is None or score > max_score:
+            c.execute("INSERT INTO scores (user_id, score) VALUES (?, ?)", (user_id, score))
+            conn.commit()
+            conn.close()
+            return f'New score {score} added for user {user_id}'
+        else:
+            conn.close()
+            return f'Score {score} is not higher than the previous highest score {max_score}, not added.'
 
-def add_score(user_id, score):
-    conn = sqlite_pool.connect()
-    c = conn.cursor()
+    def get_all_scores(self):
+        conn = sqlite3.connect(self.db_file)
+        c = conn.cursor()
 
-    c.execute("SELECT MAX(score) FROM scores WHERE user_id=?", (user_id,))
-    max_score = c.fetchone()[0]
+        c.execute("SELECT user_id, MAX(score) FROM scores GROUP BY user_id ORDER BY MAX(score) DESC")
+        all_scores = c.fetchall()
 
-    if max_score is None or score > max_score:
-        c.execute("INSERT INTO scores (user_id, score) VALUES (?, ?)", (user_id, score))
-        conn.commit()
         conn.close()
-        return f'New score {score} added for user {user_id}'
-    else:
-        conn.close()
-        return f'Score {score} is not higher than the previous highest score {max_score}, not added.'
-
-def get_all_scores():
-    conn = sqlite_pool.connect()
-    c = conn.cursor()
-
-    c.execute("SELECT user_id, MAX(score) FROM scores GROUP BY user_id ORDER BY MAX(score) DESC")
-    all_scores = c.fetchall()
-
-    conn.close()
-    return all_scores
+        return all_scores

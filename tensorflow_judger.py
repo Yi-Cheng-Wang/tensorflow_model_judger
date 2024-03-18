@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import score_manager
+from settings import SCORE_DB
 
 def prepare_data():
     xs = np.array([1, 2,  3,  4, 5, 6, 100000],  dtype=float)
@@ -27,7 +28,8 @@ def judger(file_name, user_id):
     xs, ys = prepare_data()
     predictions = model.predict(xs)
     result = score(predictions, ys)
-    message = score_manager.add_score(user_id, result)
+    score_updating = score_manager.ScoreManager(SCORE_DB)
+    message = score_updating.add_score(user_id, result)
     return result, message
 
 if __name__ == '__main__':

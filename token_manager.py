@@ -37,10 +37,11 @@ class TokenManager:
         return result[0] if result else None
 
 if __name__ == '__main__':
+    from settings import TOKEN_DB
     num_tokens = int(input("Enter the number of tokens to generate: "))
     prefix = input("Prefix String to Add: ")
 
-    token_manager = TokenManager('token_db/tokens.db')
+    token_manager = TokenManager(TOKEN_DB)
 
     token_folder = 'token_folder'
     if not os.path.exists(token_folder):
