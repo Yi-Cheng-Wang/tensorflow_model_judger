@@ -4,3 +4,5 @@ token_db
 token_folder
 score_db
 working_file
+DOCKER/evaluate
+DOCKER/judge_env

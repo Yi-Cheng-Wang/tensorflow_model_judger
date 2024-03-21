@@ -43,3 +43,6 @@ class ScoreManager:
 
         conn.close()
         return all_scores
+    
+if __name__ == '__main__':
+    print('score_manager: This file should not be __main__.')

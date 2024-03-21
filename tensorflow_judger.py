@@ -1,36 +1,47 @@
-import tensorflow as tf
-import numpy as np
 import score_manager
 from settings import SCORE_DB
+import docker
+import subprocess
+import os
 
-def prepare_data():
-    xs = np.array([1, 2,  3,  4, 5, 6, 100000],  dtype=float)
-    ys = np.array([1.0, 1.5,  2.0,  2.5, 3.0, 3.5, 50000.5],  dtype=float)
-    return xs, ys
+def judger(filename, user_id):
+    host_dir = os.path.abspath('.')
+    container_dir = ''
+    image_name = 'judge_env'
 
-def score(predictions, ansers):
-    score = 0
-    tem = 0
-    counter = 0
-    for i in predictions:
-        tem = ansers[counter] - i[0]
-        counter = counter + 1
-        if (tem < 0) :
-            tem = tem * -1
-        if (tem > 100) :
-            continue
-        score = score + (100 - tem)/100
-    score = score*(100/counter)
-    return score
+    client = docker.from_env()
+    container = client.containers.run(image_name, detach=True)
+    copy_files_to_container(client, host_dir, container_dir, container.id, filename)
 
-def judger(file_name, user_id):
-    model = tf.keras.models.load_model(file_name)
-    xs, ys = prepare_data()
-    predictions = model.predict(xs)
-    result = score(predictions, ys)
+    score = run_judger(client, container.id, container_dir)
+
+    container.stop()
+    container.remove()
+
+    message = updating_score(user_id, score)
+
+    return score, message
+
+def copy_files_to_container(client, host_dir, container_dir, container_id, filename):
+    cmd = ["docker", "cp", filename, f"{container_id}:{container_dir}/evaluate/model.h5"]
+    try:
+        subprocess.run(cmd, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e}")
+
+def run_judger(client, container_id, container_dir):
+    container = client.containers.get(container_id)
+    container.start()
+    container.wait()
+    output = container.logs()
+    output = output.decode('utf-8')
+    msg, result = output.split("<flag: score_appear_here>")
+    return float(result)
+
+def updating_score(user_id, result):
     score_updating = score_manager.ScoreManager(SCORE_DB)
     message = score_updating.add_score(user_id, result)
-    return result, message
+    return message
 
 if __name__ == '__main__':
     print('tensorflow_judger: This file should not be __main__.')

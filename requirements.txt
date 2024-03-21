@@ -1,5 +1,6 @@
+docker_py==1.10.6
 Flask==3.0.2
 numpy==1.24.3
 tensorflow==2.13.0
-tensorflow_intel
+tensorflow_intel==2.13.0
 Werkzeug==3.0.1

@@ -7,6 +7,18 @@ import os
 import secrets
 import string
 import settings
+import docker_builder
+import shutil
+
+source_folder = './evaluate'
+destination_folder = './DOCKER/evaluate'
+
+if os.path.exists(destination_folder):
+    shutil.rmtree(destination_folder)
+
+shutil.copytree(source_folder, destination_folder)
+
+docker_builder.builder()
 
 directories = ['token_db', 'file_storage', 'score_db']
 for directory in directories:
@@ -59,7 +71,7 @@ def upload_file(user_id):
 
     # check if the file legal
     if file and allowed_file(file.filename):
-        filename = './file_storage/' + str(user_id) + '_' + secure_filename(generate_random_string(32))
+        filename = './file_storage/' + str(user_id) + '_' + secure_filename(generate_random_string(32)) + '.h5'
         file.save(filename)
         result, message = tensorflow_judger.judger(filename, user_id)
         return jsonify({'score': result, 'status': 'success', 'message': message, 'user': user_id})
@@ -87,4 +99,4 @@ def generate_random_string(length):
     return ''.join(secrets.choice(alphabet) for _ in range(length))
 
 if __name__ == '__main__':
-    app.run(threaded=True, host='localhost', port=80)
+    app.run(threaded=True, host='localhost', port=8088)
